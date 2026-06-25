@@ -35,13 +35,18 @@ export default function RecipeGate({ product, recipes }) {
       return;
     }
     
+    localStorage.setItem(`unlocked_${product}`, "true");
+
+    const productName =
+  product === "breast"
+    ? "Boneless Skinless Chicken Breast"
+    : "Drumstick";
+    
     if (product === "breast") {
       window.location.href = "/freshbbl";
     } else if (product === "drumstick") {
       window.location.href = "/drumstick";
-    } else {
-      window.location.href = "/freshbbl";
-    } 
+    }
   }
 
 

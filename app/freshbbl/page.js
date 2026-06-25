@@ -37,7 +37,7 @@ const recipes = [
 export default function FreshBBL() {
   return (
     <RecipeGate
-      product="Boneless Skinless Chicken Breast"
+      product="breast"
       recipes={recipes}
     />
   );
