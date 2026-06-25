@@ -34,8 +34,14 @@ export default function RecipeGate({ product, recipes }) {
       alert(data.error || "Something went wrong.");
       return;
     }
-  
-    window.location.href = `/recipes?product=${product}`;
+    
+    if (product === "breast") {
+      window.location.href = "/freshbbl";
+    } else if (product === "drumstick") {
+      window.location.href = "/drumstick";
+    } else {
+      window.location.href = "/freshbbl";
+    } 
   }
 
 
