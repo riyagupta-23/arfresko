@@ -17,11 +17,7 @@ export default function RecipeGate({ product, recipes }) {
       return;
     }
   
-    // open recipes immediately
-    setUnlocked(true);
-  
-    // save number in background
-    fetch("/api/lead", {
+    const res = await fetch("/api/lead", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,10 +26,38 @@ export default function RecipeGate({ product, recipes }) {
         phone,
         product,
       }),
-    }).catch((error) => {
-      console.error("Lead save failed:", error);
     });
+  
+    const data = await res.json();
+  
+    if (!res.ok) {
+      alert(data.error || "Something went wrong.");
+      return;
+    }
+  
+    // Show recipes
+    window.location.href = `/recipes?product=${product}`;
+
+    const { error } = await supabase
+    .from("leads")
+    .insert([
+      {
+        phone,
+        product,
+      },
+    ]);
+  
+  if (error) {
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
   }
+  
+  return NextResponse.json({ success: true });
+  }
+
+
   
   async function saveRecipePDF(recipe) {
     const doc = new jsPDF();
