@@ -17,12 +17,18 @@ export async function POST(req) {
 
     const { phone, product } = await req.json();
 
-    const { error } = await supabase.from("leads").insert([
-      {
-        phone,
-        product,
-      },
-    ]);
+    const { error } = await supabase.from("leads").upsert(
+        [
+          {
+            phone,
+            product,
+          },
+        ],
+        {
+          onConflict: "phone",
+          ignoreDuplicates: true,
+        }
+      );
 
     if (error) {
       return NextResponse.json(
