@@ -35,26 +35,7 @@ export default function RecipeGate({ product, recipes }) {
       return;
     }
   
-    // Show recipes
     window.location.href = `/recipes?product=${product}`;
-
-    const { error } = await supabase
-    .from("leads")
-    .insert([
-      {
-        phone,
-        product,
-      },
-    ]);
-  
-  if (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
-  }
-  
-  return NextResponse.json({ success: true });
   }
 
 
