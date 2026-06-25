@@ -17,23 +17,22 @@ export default function RecipeGate({ product, recipes }) {
       return;
     }
   
-    try {
-      await fetch("/api/lead", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phone,
-          product,
-        }),
-      });
-    } catch (error) {
-      console.error("Lead save failed:", error);
-    }
-  
-    // Always open recipes
+    // open recipes immediately
     setUnlocked(true);
+  
+    // save number in background
+    fetch("/api/lead", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        phone,
+        product,
+      }),
+    }).catch((error) => {
+      console.error("Lead save failed:", error);
+    });
   }
   
   async function saveRecipePDF(recipe) {
