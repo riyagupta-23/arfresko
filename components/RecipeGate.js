@@ -41,7 +41,8 @@ export default function RecipeGate({ product, recipes }) {
       alert(data.error || "Something went wrong.");
       return;
     }
-    
+
+    localStorage.removeItem("unlocked_breast")
     localStorage.setItem(`unlocked_${product}`, "true");
     setUnlocked(true);
 }
