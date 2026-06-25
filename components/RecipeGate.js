@@ -17,24 +17,22 @@ export default function RecipeGate({ product, recipes }) {
       return;
     }
   
-    const res = await fetch("/api/lead", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        phone,
-        product,
-      }),
-    });
-  
-    const data = await res.json();
-  
-    if (!res.ok) {
-      alert(data.error || "Something went wrong. Please try again.");
-      return;
+    try {
+      await fetch("/api/lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phone,
+          product,
+        }),
+      });
+    } catch (error) {
+      console.error("Lead save failed:", error);
     }
   
+    // Always open recipes
     setUnlocked(true);
   }
   
