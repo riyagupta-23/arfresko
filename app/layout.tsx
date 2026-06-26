@@ -19,6 +19,8 @@ export const metadata = {
   description: "Freshness you can trust",
   icons: {
     icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
 };
 
