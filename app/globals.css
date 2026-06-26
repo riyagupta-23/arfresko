@@ -513,4 +513,164 @@ small {
     background: #071f45;
     color: white;
   }
+
+  .brand-page {
+    min-height: 100vh;
+    background: #fff8ef;
+    color: #071f45;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  }
+  
+  .brand-hero {
+    text-align: center;
+    padding: 80px 20px 90px;
+    background:
+      radial-gradient(circle at top left, rgba(255, 185, 90, 0.45), transparent 35%),
+      linear-gradient(135deg, #fffaf3 0%, #fff1dc 45%, #ff8a1c 100%);
+  }
+  
+  .brand-logo {
+    width: 190px;
+    background: white;
+    padding: 18px 28px;
+    border-radius: 28px;
+    box-shadow: 0 18px 45px rgba(7, 31, 69, 0.12);
+    margin-bottom: 28px;
+  }
+  
+  .brand-hero h1 {
+    font-size: clamp(38px, 6vw, 72px);
+    line-height: 1;
+    margin-bottom: 18px;
+    letter-spacing: -2px;
+    font-weight: 900;
+  }
+  
+  .brand-hero p {
+    font-size: 18px;
+    max-width: 760px;
+  }
+  
+  .hero-buttons a,
+  .product-card a {
+    background: #071f45;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 800;
+    box-shadow: 0 10px 22px rgba(7, 31, 69, 0.18);
+  }
+  
+  .hero-buttons .secondary {
+    background: white;
+    color: #071f45;
+  }
+  
+  .brand-section {
+    padding: 70px 20px;
+    text-align: center;
+  }
+  
+  .brand-section h2,
+  .recipe-banner h2,
+  .contact-section h2 {
+    font-size: clamp(30px, 4vw, 46px);
+    letter-spacing: -1px;
+    margin-bottom: 18px;
+    font-weight: 900;
+  }
+  
+  .brand-section p,
+  .recipe-banner p {
+    font-size: 17px;
+    max-width: 820px;
+    line-height: 1.75;
+  }
+  
+  .trust-grid,
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 22px;
+    padding: 45px 20px;
+    max-width: 1120px;
+    margin: auto;
+  }
+  
+  .trust-grid div,
+  .product-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(245, 130, 31, 0.18);
+    border-radius: 28px;
+    padding: 32px;
+    box-shadow: 0 18px 40px rgba(7, 31, 69, 0.08);
+  }
+  
+  .trust-grid h3 {
+    color: #f5821f;
+    font-size: 34px;
+    margin-bottom: 8px;
+    font-weight: 900;
+  }
+  
+  .product-card h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+  
+  .product-card p {
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  
+  .recipe-banner {
+    background:
+      linear-gradient(135deg, rgba(7, 31, 69, 0.96), rgba(7, 31, 69, 0.88)),
+      linear-gradient(45deg, #f5821f, #ffe1b8);
+    color: white;
+    text-align: center;
+    padding: 75px 20px;
+  }
+  
+  .certs {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+  }
+  
+  .certs span {
+    background: white;
+    color: #071f45;
+    padding: 12px 18px;
+    border-radius: 999px;
+    font-weight: 800;
+    border: 1px solid #ffe1b8;
+    box-shadow: 0 8px 18px rgba(7, 31, 69, 0.06);
+  }
+  
+  .contact-section {
+    background: linear-gradient(180deg, #ffffff, #fff3e3);
+    text-align: center;
+    padding: 70px 20px;
+  }
+  
+  .contact-section p {
+    font-size: 17px;
+  }
+  
+  .insta {
+    font-weight: 900;
+    color: #f5821f;
+  }
+  
+  .brand-footer {
+    text-align: center;
+    padding: 26px;
+    background: #071f45;
+    color: white;
+    font-weight: 600;
+  }
 }
