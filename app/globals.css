@@ -376,4 +376,141 @@ small {
   .chef-card h2 {
     font-size: 18px;
   }
+
+  .brand-page {
+    min-height: 100vh;
+    background: #fff7ed;
+    color: #071f45;
+    font-family: Arial, sans-serif;
+  }
+  
+  .brand-hero {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(180deg, #fff, #ff8a1c);
+  }
+  
+  .brand-logo {
+    width: 170px;
+    margin-bottom: 24px;
+  }
+  
+  .brand-hero h1 {
+    font-size: 42px;
+    margin-bottom: 12px;
+  }
+  
+  .brand-hero p,
+  .brand-section p,
+  .recipe-banner p {
+    max-width: 720px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  
+  .hero-buttons {
+    margin-top: 28px;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  
+  .hero-buttons a,
+  .product-card a {
+    background: #071f45;
+    color: white;
+    padding: 12px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 700;
+  }
+  
+  .hero-buttons .secondary {
+    background: white;
+    color: #071f45;
+  }
+  
+  .brand-section {
+    padding: 50px 20px;
+    text-align: center;
+  }
+  
+  .brand-section h2,
+  .recipe-banner h2,
+  .contact-section h2 {
+    font-size: 30px;
+    margin-bottom: 16px;
+  }
+  
+  .trust-grid,
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 40px 20px;
+    max-width: 1050px;
+    margin: auto;
+  }
+  
+  .trust-grid div,
+  .product-card {
+    background: white;
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+  }
+  
+  .trust-grid h3 {
+    color: #f5821f;
+    font-size: 28px;
+  }
+  
+  .product-card h3 {
+    margin-bottom: 12px;
+  }
+  
+  .product-card p {
+    margin-bottom: 20px;
+  }
+  
+  .recipe-banner {
+    background: #071f45;
+    color: white;
+    text-align: center;
+    padding: 50px 20px;
+  }
+  
+  .certs {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  
+  .certs span {
+    background: white;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  
+  .contact-section {
+    background: white;
+    text-align: center;
+    padding: 50px 20px;
+  }
+  
+  .insta {
+    font-weight: 700;
+    color: #f5821f;
+  }
+  
+  .brand-footer {
+    text-align: center;
+    padding: 22px;
+    background: #071f45;
+    color: white;
+  }
 }
