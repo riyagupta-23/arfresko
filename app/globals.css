@@ -376,37 +376,6 @@ small {
   .chef-card h2 {
     font-size: 18px;
   }
-
-  .brand-page {
-    min-height: 100vh;
-    background: #fff7ed;
-    color: #071f45;
-    font-family: Arial, sans-serif;
-  }
-  
-  .brand-hero {
-    text-align: center;
-    padding: 60px 20px;
-    background: linear-gradient(180deg, #fff, #ff8a1c);
-  }
-  
-  .brand-logo {
-    width: 170px;
-    margin-bottom: 24px;
-  }
-  
-  .brand-hero h1 {
-    font-size: 42px;
-    margin-bottom: 12px;
-  }
-  
-  .brand-hero p,
-  .brand-section p,
-  .recipe-banner p {
-    max-width: 720px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
   
   .hero-buttons {
     margin-top: 28px;
@@ -430,18 +399,7 @@ small {
     background: white;
     color: #071f45;
   }
-  
-  .brand-section {
-    padding: 50px 20px;
-    text-align: center;
-  }
-  
-  .brand-section h2,
-  .recipe-banner h2,
-  .contact-section h2 {
-    font-size: 30px;
-    margin-bottom: 16px;
-  }
+
   
   .trust-grid,
   .product-grid {
@@ -507,13 +465,102 @@ small {
     color: #f5821f;
   }
   
-  .brand-footer {
-    text-align: center;
-    padding: 22px;
+ 
+  
+  .hero-buttons a,
+  .product-card a {
     background: #071f45;
     color: white;
+    padding: 14px 24px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 800;
+    box-shadow: 0 10px 22px rgba(7, 31, 69, 0.18);
   }
-
+  
+  .hero-buttons .secondary {
+    background: white;
+    color: #071f45;
+  }
+  
+  
+  .trust-grid,
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 22px;
+    padding: 45px 20px;
+    max-width: 1120px;
+    margin: auto;
+  }
+  
+  .trust-grid div,
+  .product-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(245, 130, 31, 0.18);
+    border-radius: 28px;
+    padding: 32px;
+    box-shadow: 0 18px 40px rgba(7, 31, 69, 0.08);
+  }
+  
+  .trust-grid h3 {
+    color: #f5821f;
+    font-size: 34px;
+    margin-bottom: 8px;
+    font-weight: 900;
+  }
+  
+  .product-card h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+  
+  .product-card p {
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  
+  .recipe-banner {
+    background:
+      linear-gradient(135deg, rgba(7, 31, 69, 0.96), rgba(7, 31, 69, 0.88)),
+      linear-gradient(45deg, #f5821f, #ffe1b8);
+    color: white;
+    text-align: center;
+    padding: 75px 20px;
+  }
+  
+  .certs {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+  }
+  
+  .certs span {
+    background: white;
+    color: #071f45;
+    padding: 12px 18px;
+    border-radius: 999px;
+    font-weight: 800;
+    border: 1px solid #ffe1b8;
+    box-shadow: 0 8px 18px rgba(7, 31, 69, 0.06);
+  }
+  
+  .contact-section {
+    background: linear-gradient(180deg, #ffffff, #fff3e3);
+    text-align: center;
+    padding: 70px 20px;
+  }
+  
+  .contact-section p {
+    font-size: 17px;
+  }
+  
+  .insta {
+    font-weight: 900;
+    color: #f5821f;
+  }
   .brand-page {
     min-height: 100vh;
     background: #fff8ef;
