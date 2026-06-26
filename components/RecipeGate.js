@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import jsPDF from "jspdf";
 import { supabase } from "@/lib/supabase";
 
@@ -10,11 +10,6 @@ export default function RecipeGate({ product, recipes }) {
   const [unlocked, setUnlocked] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
-  useEffect(() => {
-    if (localStorage.getItem(`unlocked_${product}`) === "true") {
-      setUnlocked(true);
-    }
-  }, [product]);
   
   async function submitPhone(e) {
     e.preventDefault();
@@ -42,8 +37,6 @@ export default function RecipeGate({ product, recipes }) {
       return;
     }
 
-    localStorage.removeItem("unlocked_breast")
-    localStorage.setItem(`unlocked_${product}`, "true");
     setUnlocked(true);
 }
 
