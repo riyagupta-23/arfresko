@@ -1,58 +1,69 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-
 
 function ClubContent() {
   const searchParams = useSearchParams();
   const product = searchParams.get("product") || "freshbbl";
 
+  const MEMBER_LIMIT = 2000;
+
   const [form, setForm] = useState({ name: "", phone: "", city: "" });
   const [joined, setJoined] = useState(false);
+  const [memberCount, setMemberCount] = useState(0);
+  const [memberNumber, setMemberNumber] = useState(null);
 
-  const MEMBER_LIMIT = 2000;
-const [memberCount, setMemberCount] = useState(0);
+  const remainingMembers = Math.max(MEMBER_LIMIT - memberCount, 0);
 
-useEffect(() => {
-  async function getMemberCount() {
-    const { count, error } = await supabase
-      .from("club_members")
-      .select("*", { count: "exact", head: true });
+  useEffect(() => {
+    async function getMemberCount() {
+      const { count, error } = await supabase
+        .from("club_members")
+        .select("*", { count: "exact", head: true });
 
-    if (!error && count !== null) {
-      setMemberCount(count);
+      if (!error && count !== null) {
+        setMemberCount(count);
+      }
     }
-  }
 
-  getMemberCount();
-}, []);
-
-const remainingMembers = Math.max(MEMBER_LIMIT - memberCount, 0);
+    getMemberCount();
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!form.name.trim()) return alert("Please enter your name");
-    if (!/^[6-9]\d{9}$/.test(form.phone))
-      return alert("Please enter a valid 10-digit WhatsApp number");
+    if (!form.name.trim()) {
+      alert("Please enter your name");
+      return;
+    }
+
+    if (!/^[6-9]\d{9}$/.test(form.phone)) {
+      alert("Please enter a valid 10-digit WhatsApp number");
+      return;
+    }
 
     const { error } = await supabase.from("club_members").upsert(
       {
-        name: form.name,
-        phone: form.phone,
-        city: form.city,
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        city: form.city.trim(),
         product,
       },
       { onConflict: "phone" }
     );
 
-    if (error) return alert(error.message);
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
+    const newCount = memberCount + 1;
+    setMemberCount(newCount);
+    setMemberNumber(newCount);
     localStorage.setItem("ar_fresko_club_member", "true");
     setJoined(true);
-    setMemberCount((prev) => prev + 1);
   }
 
   function goToRecipes() {
@@ -64,17 +75,18 @@ const remainingMembers = Math.max(MEMBER_LIMIT - memberCount, 0);
       <section style={styles.card}>
         {!joined ? (
           <>
-            <p style={styles.badge}>
-                Limited to first 2,000 members
-            </p>
+            <p style={styles.badge}>Limited to first 2,000 members</p>
 
             <p style={styles.counter}>
-                {remainingMembers} founding memberships left
+              {remainingMembers} founding memberships left
             </p>
+
             <h1 style={styles.title}>Welcome to the AR Fresko Club</h1>
+
             <p style={styles.subtitle}>
-              Join as a founding member to unlock chef recipes, product trials,
-              surprise rewards and member-only benefits.
+              Fresh chicken is just the beginning. Join as a founding member to
+              unlock chef recipes, product trials, surprise rewards and
+              member-only benefits.
             </p>
 
             <div style={styles.benefits}>
@@ -86,12 +98,26 @@ const remainingMembers = Math.max(MEMBER_LIMIT - memberCount, 0);
             </div>
 
             <form onSubmit={handleSubmit} style={styles.form}>
-              <input style={styles.input} placeholder="Your name" value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })} />
-              <input style={styles.input} placeholder="WhatsApp number" value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-              <input style={styles.input} placeholder="City" value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })} />
+              <input
+                style={styles.input}
+                placeholder="Your name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+
+              <input
+                style={styles.input}
+                placeholder="WhatsApp number"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+
+              <input
+                style={styles.input}
+                placeholder="City"
+                value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })}
+              />
 
               <button style={styles.button} type="submit">
                 Become a Member
@@ -101,13 +127,31 @@ const remainingMembers = Math.max(MEMBER_LIMIT - memberCount, 0);
         ) : (
           <>
             <p style={styles.badge}>Membership Confirmed</p>
+
             <h1 style={styles.title}>Welcome to the Club 🎉</h1>
+
             <p style={styles.subtitle}>
-              Your member-only chef recipes are now unlocked.
+              You are now one of the AR Fresko Founding Members.
             </p>
+
+            <div style={styles.memberBox}>
+              Member #{String(memberNumber || memberCount).padStart(4, "0")}
+            </div>
+
+            <div style={styles.benefits}>
+              <p>✓ Chef Recipes Unlocked</p>
+              <p>✓ Future Product Trials</p>
+              <p>✓ Monthly Member Giveaways</p>
+              <p>✓ Early Access to New Launches</p>
+            </div>
+
             <button style={styles.button} onClick={goToRecipes}>
-              View Chef Recipes
+              Unlock Chef Recipes
             </button>
+
+            <p style={styles.note}>
+              More member benefits launching soon.
+            </p>
           </>
         )}
       </section>
@@ -149,6 +193,12 @@ const styles = {
     padding: "8px 14px",
     borderRadius: "999px",
     fontSize: "13px",
+    marginBottom: "12px",
+  },
+  counter: {
+    color: "#143d36",
+    fontSize: "15px",
+    fontWeight: "bold",
     marginBottom: "18px",
   },
   title: {
@@ -178,12 +228,6 @@ const styles = {
     flexDirection: "column",
     gap: "12px",
   },
-  counter: {
-    color: "#143d36",
-    fontSize: "15px",
-    fontWeight: "bold",
-    marginBottom: "18px",
-  },
   input: {
     padding: "14px",
     borderRadius: "12px",
@@ -199,5 +243,20 @@ const styles = {
     fontSize: "16px",
     fontWeight: "bold",
     cursor: "pointer",
+    width: "100%",
+  },
+  memberBox: {
+    background: "#143d36",
+    color: "#fff",
+    padding: "16px",
+    borderRadius: "16px",
+    fontSize: "22px",
+    fontWeight: "bold",
+    marginBottom: "22px",
+  },
+  note: {
+    marginTop: "16px",
+    fontSize: "13px",
+    color: "#777",
   },
 };
