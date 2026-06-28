@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Html5QrcodeScanner } from "html5-qrcode";
 import { supabase } from "@/lib/supabase";
 
 function MemberContent() {
@@ -9,36 +10,104 @@ function MemberContent() {
   const memberId = searchParams.get("id");
 
   const [member, setMember] = useState(null);
-  const [code, setCode] = useState("");
+  const [points, setPoints] = useState(0);
+  const [packsScanned, setPacksScanned] = useState(0);
+  const [scanResult, setScanResult] = useState("");
 
   useEffect(() => {
     async function loadMember() {
       const savedId = memberId || localStorage.getItem("ar_fresko_member_id");
-
       if (!savedId) return;
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("club_members")
         .select("*")
         .eq("id", savedId)
         .single();
 
-      if (!error && data) {
+      if (data) {
         setMember(data);
+        localStorage.setItem("ar_fresko_member_id", data.id);
       }
     }
 
     loadMember();
   }, [memberId]);
 
-  async function addPurchase() {
-    if (!code.trim()) {
-      alert("Please enter or scan your pack code");
-      return;
+  useEffect(() => {
+    async function loadPurchaseStats() {
+      if (!member) return;
+
+      const { data } = await supabase
+        .from("purchase_history")
+        .select("points")
+        .eq("member_id", member.id);
+
+      if (data) {
+        setPacksScanned(data.length);
+        setPoints(data.reduce((sum, row) => sum + (row.points || 0), 0));
+      }
     }
 
-    alert("Purchase scan feature coming soon. Your code was captured: " + code);
-    setCode("");
+    loadPurchaseStats();
+  }, [member]);
+
+  function startScanner() {
+    const scanner = new Html5QrcodeScanner(
+      "barcode-reader",
+      { fps: 10, qrbox: 250 },
+      false
+    );
+
+    scanner.render(
+      async (decodedText) => {
+        scanner.clear();
+        setScanResult(decodedText);
+        await redeemBarcode(decodedText);
+      },
+      () => {}
+    );
+  }
+
+  async function redeemBarcode(barcode) {
+    if (!member) return alert("Member not loaded");
+
+    const { data: pack } = await supabase
+      .from("pack_barcodes")
+      .select("*")
+      .eq("barcode", barcode)
+      .maybeSingle();
+
+    if (!pack) return alert("Invalid AR Fresko barcode");
+
+    if (pack.used) return alert("This pack has already been scanned");
+
+    const { error: historyError } = await supabase
+      .from("purchase_history")
+      .insert({
+        member_id: member.id,
+        barcode: pack.barcode,
+        product: pack.product,
+        points: pack.points,
+      });
+
+    if (historyError) return alert(historyError.message);
+
+    const { error: updateError } = await supabase
+      .from("pack_barcodes")
+      .update({
+        used: true,
+        used_by: member.id,
+        used_at: new Date().toISOString(),
+      })
+      .eq("barcode", barcode);
+
+    if (updateError) return alert(updateError.message);
+
+    setPoints((prev) => prev + (pack.points || 0));
+    setPacksScanned((prev) => prev + 1);
+
+    alert(`${pack.product} added. +${pack.points} Fresko Points`);
   }
 
   if (!member) {
@@ -47,10 +116,7 @@ function MemberContent() {
         <section style={styles.card}>
           <h1 style={styles.title}>Member Portal</h1>
           <p style={styles.subtitle}>Membership not found. Please sign in again.</p>
-          <button
-            style={styles.button}
-            onClick={() => (window.location.href = "/club")}
-          >
+          <button style={styles.button} onClick={() => (window.location.href = "/club")}>
             Go to Club Login
           </button>
         </section>
@@ -66,17 +132,17 @@ function MemberContent() {
         <h1 style={styles.title}>Hi {member.name} 👋</h1>
 
         <div style={styles.memberBox}>
-          Member #{String(member.member_no || "").padStart(4, "0")}
+          {member.member_code || `Member #${String(member.member_no || "").padStart(4, "0")}`}
         </div>
 
         <div style={styles.statsGrid}>
           <div style={styles.statBox}>
-            <h3>0</h3>
+            <h3>{points}</h3>
             <p>Fresko Points</p>
           </div>
 
           <div style={styles.statBox}>
-            <h3>0</h3>
+            <h3>{packsScanned}</h3>
             <p>Packs Scanned</p>
           </div>
         </div>
@@ -84,24 +150,17 @@ function MemberContent() {
         <div style={styles.scanBox}>
           <h3>Scan Your Pack</h3>
           <p>
-            Enter the code printed on the back of your AR Fresko pack to add it
-            to your purchase history.
+            Scan the unique barcode printed on the back of your AR Fresko sleeve
+            to add this purchase to your history.
           </p>
 
-          <input
-            style={styles.input}
-            placeholder="Enter pack code"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-
-          <button style={styles.button} onClick={addPurchase}>
-            Add to Purchase History
+          <button style={styles.button} onClick={startScanner}>
+            Scan Pack Barcode
           </button>
 
-          <p style={styles.note}>
-            Barcode/QR scanning and loyalty points will be activated soon.
-          </p>
+          <div id="barcode-reader" style={{ marginTop: "16px" }}></div>
+
+          {scanResult && <p style={styles.note}>Last scanned: {scanResult}</p>}
         </div>
 
         <button
@@ -189,15 +248,6 @@ const styles = {
     borderRadius: "16px",
     marginBottom: "18px",
     color: "#0F4C4C",
-  },
-  input: {
-    width: "100%",
-    boxSizing: "border-box",
-    padding: "14px",
-    borderRadius: "12px",
-    border: "1px solid #ddd",
-    fontSize: "15px",
-    marginBottom: "12px",
   },
   button: {
     padding: "15px",

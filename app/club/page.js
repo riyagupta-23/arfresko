@@ -3,12 +3,13 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { Html5QrcodeScanner } from "html5-qrcode";
 
 function ClubContent() {
   const searchParams = useSearchParams();
   const product = searchParams.get("product") || "freshbbl";
-
-  const MEMBER_LIMIT = 2000;
+  const [scanResult, setScanResult] = useState("");
+  const MEMBER_LIMIT = 5000;
 
   const [form, setForm] = useState({ name: "", phone: "", city: "" });
   const [joined, setJoined] = useState(false);
@@ -129,6 +130,86 @@ function ClubContent() {
     window.location.href = `/${product}`;
   }
 
+  function startScanner() {
+    const scanner = new Html5QrcodeScanner(
+      "barcode-reader",
+      {
+        fps: 10,
+        qrbox: 250,
+      },
+      false
+    );
+  
+    scanner.render(
+      async (decodedText) => {
+        scanner.clear();
+        setScanResult(decodedText);
+        await redeemBarcode(decodedText);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+
+  async function redeemBarcode(barcode) {
+    if (!member) {
+      alert("Member not loaded");
+      return;
+    }
+  
+    const { data: pack, error: packError } = await supabase
+      .from("pack_barcodes")
+      .select("*")
+      .eq("barcode", barcode)
+      .maybeSingle();
+  
+    if (packError) {
+      alert(packError.message);
+      return;
+    }
+  
+    if (!pack) {
+      alert("Invalid AR Fresko barcode");
+      return;
+    }
+  
+    if (pack.used) {
+      alert("This pack has already been scanned");
+      return;
+    }
+  
+    const { error: historyError } = await supabase
+      .from("purchase_history")
+      .insert({
+        member_id: member.id,
+        barcode: pack.barcode,
+        product: pack.product,
+        points: pack.points,
+      });
+  
+    if (historyError) {
+      alert(historyError.message);
+      return;
+    }
+  
+    const { error: updateError } = await supabase
+      .from("pack_barcodes")
+      .update({
+        used: true,
+        used_by: member.id,
+        used_at: new Date().toISOString(),
+      })
+      .eq("barcode", barcode);
+  
+    if (updateError) {
+      alert(updateError.message);
+      return;
+    }
+  
+    alert(`${pack.product} added to your purchase history. +${pack.points} Fresko Points`);
+  }
+
   return (
     <main style={styles.page}>
       <section style={styles.card}>
@@ -242,6 +323,7 @@ const styles = {
     padding: "24px",
     fontFamily: "Arial, sans-serif",
   },
+  
   card: {
     maxWidth: "520px",
     width: "100%",
