@@ -223,7 +223,7 @@ function ClubContent() {
       <section style={styles.card}>
         {!joined ? (
           <>
-            <p style={styles.badge}>Limited to first 2,000 members</p>
+            <p style={styles.badge}>Limited to first 5,000 members</p>
 
             <p style={styles.counter}>
               {remainingMembers} founding memberships left
