@@ -2,45 +2,11 @@
 
 import { useState } from "react";
 import jsPDF from "jspdf";
-import { supabase } from "@/lib/supabase";
 
 
 export default function RecipeGate({ product, recipes }) {
-  const [phone, setPhone] = useState("");
-  const [unlocked, setUnlocked] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-
   
-  async function submitPhone(e) {
-    e.preventDefault();
-  
-    if (!/^[6-9]\d{9}$/.test(phone)) {
-      alert("Please enter a valid 10-digit mobile number");
-      return;
-    }
-  
-    const res = await fetch("/api/lead", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        phone,
-        product,
-      }),
-    });
-  
-    const data = await res.json();
-  
-    if (!res.ok) {
-      alert(data.error || "Something went wrong.");
-      return;
-    }
-
-    setUnlocked(true);
-}
-
-
   
   async function saveRecipePDF(recipe) {
     const doc = new jsPDF();
@@ -54,7 +20,7 @@ export default function RecipeGate({ product, recipes }) {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
-    doc.text("AR Fresko", 15, 22);
+    doc.text("AR Fresko", 115, 22);
 
     try {
         const logoResponse = await fetch("/logo.png");
@@ -189,52 +155,22 @@ doc.text(
         <h1>{product}</h1>
       </section>
 
-      {!unlocked ? (
-        <form onSubmit={submitPhone} className="gate-card">
-          <h3>Unlock 3 Chef-Style Recipes</h3>
-          <p>Enter your phone number to view recipes made for this pack.</p>
-
-          <div className="phone-input">
-            <span>+91</span>
-            <input
-              type="tel"
-              inputMode="numeric"
-              pattern="[0-9]{10}"
-              maxLength="10"
-              placeholder="Mobile Number"
-              value={phone}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "");
-                setPhone(value);
-              }}
-            />
-          </div>
-
-          <button>VIEW RECIPES</button>
-
-          <small>
-            By continuing, you agree to receive recipe and product updates from
-            AR Fresko.
-          </small>
-        </form>
-      ) : (
-        <section className="recipe-grid">
-          {recipes.map((r, i) => (
-            <button
-              key={i}
-              className="recipe-card"
-              onClick={() => setSelectedRecipe(r)}
-            >
-              <p className="recipe-number">Recipe {i + 1}</p>
-              <h3>{r.title}</h3>
-              <p>
-                <b>Time:</b> {r.time}
-              </p>
-              <p>{r.desc}</p>
-            </button>
-          ))}
-        </section>
-      )}
+      <section className="recipe-grid">
+  {recipes.map((r, i) => (
+    <button
+      key={i}
+      className="recipe-card"
+      onClick={() => setSelectedRecipe(r)}
+    >
+      <p className="recipe-number">Recipe {i + 1}</p>
+      <h3>{r.title}</h3>
+      <p>
+        <b>Time:</b> {r.time}
+      </p>
+      <p>{r.desc}</p>
+    </button>
+  ))}
+</section> 
 
       
 
