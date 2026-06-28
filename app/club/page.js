@@ -184,9 +184,19 @@ function ClubContent() {
               Your member-only chef recipes are now unlocked.
             </p>
 
-            <div style={styles.memberBox}>
-              Member #{String(memberNumber || "").padStart(4, "0")}
-            </div>
+            <button
+  style={styles.memberBoxButton}
+  onClick={() => {
+    const memberId = localStorage.getItem("ar_fresko_member_id");
+    window.location.href = `/member?id=${memberId}`;
+  }}
+>
+  Member #{String(memberNumber || "").padStart(4, "0")}
+  <br />
+  <span style={{ fontSize: "13px", fontWeight: "normal" }}>
+    Tap to open your portal
+  </span>
+</button>
 
             <button style={styles.button} onClick={goToRecipes}>
               Unlock Chef Recipes
@@ -303,5 +313,17 @@ const styles = {
     fontSize: "22px",
     fontWeight: "bold",
     marginBottom: "22px",
+  },
+  memberBoxButton: {
+    background: "#F47B20",
+    color: "#fff",
+    padding: "16px",
+    borderRadius: "16px",
+    fontSize: "22px",
+    fontWeight: "bold",
+    marginBottom: "22px",
+    border: "none",
+    cursor: "pointer",
+    width: "100%",
   },
 };
