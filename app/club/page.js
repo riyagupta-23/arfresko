@@ -1,72 +1,79 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+
 
 function ClubContent() {
   const searchParams = useSearchParams();
   const product = searchParams.get("product") || "freshbbl";
 
-  const MEMBER_LIMIT = 2000;
-
   const [form, setForm] = useState({ name: "", phone: "", city: "" });
   const [joined, setJoined] = useState(false);
-  const [memberCount, setMemberCount] = useState(0);
-  const [memberNumber, setMemberNumber] = useState(null);
 
-  const remainingMembers = Math.max(MEMBER_LIMIT - memberCount, 0);
+  const MEMBER_LIMIT = 2000;
+const [memberCount, setMemberCount] = useState(0);
 
-  useEffect(() => {
-    async function getMemberCount() {
-      const { count, error } = await supabase
-        .from("club_members")
-        .select("*", { count: "exact", head: true });
+useEffect(() => {
+  async function getMemberCount() {
+    const { count, error } = await supabase
+      .from("club_members")
+      .select("*", { count: "exact", head: true });
 
-      if (!error && count !== null) {
-        setMemberCount(count);
-      }
+    if (!error && count !== null) {
+      setMemberCount(count);
     }
+  }
 
-    getMemberCount();
-  }, []);
+  getMemberCount();
+}, []);
 
-  async function handleSubmit(e) {
+const remainingMembers = Math.max(MEMBER_LIMIT - memberCount, 0);
+
+async function handleSubmit(e) {
     e.preventDefault();
-
+  
     if (!form.name.trim()) {
       alert("Please enter your name");
       return;
     }
-
+  
     if (!/^[6-9]\d{9}$/.test(form.phone)) {
       alert("Please enter a valid 10-digit WhatsApp number");
       return;
     }
-
-    const { error } = await supabase.from("club_members").upsert(
-      {
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        city: form.city.trim(),
-        product,
-      },
-      { onConflict: "phone" }
-    );
-
+  
+    const { data, error } = await supabase
+      .from("club_members")
+      .upsert(
+        {
+          name: form.name.trim(),
+          phone: form.phone.trim(),
+          city: form.city.trim(),
+          product,
+        },
+        { onConflict: "phone" }
+      )
+      .select()
+      .single();
+  
     if (error) {
       alert(error.message);
       return;
     }
-
-    const newCount = memberCount + 1;
-    setMemberCount(newCount);
-    setMemberNumber(newCount);
+  
     localStorage.setItem("ar_fresko_club_member", "true");
+    localStorage.setItem("ar_fresko_member_id", data.id);
+    localStorage.setItem("ar_fresko_member_no", data.member_no);
+    localStorage.setItem(`unlocked_${product}`, "true");
+  
+    setMemberNumber(data.member_no);
     setJoined(true);
   }
 
   function goToRecipes() {
+    localStorage.setItem(`unlocked_${product}`, "true");
     window.location.href = `/${product}`;
   }
 
@@ -75,18 +82,17 @@ function ClubContent() {
       <section style={styles.card}>
         {!joined ? (
           <>
-            <p style={styles.badge}>Limited to first 2,000 members</p>
-
-            <p style={styles.counter}>
-              {remainingMembers} founding memberships left
+            <p style={styles.badge}>
+                Limited to first 2,000 members
             </p>
 
+            <p style={styles.counter}>
+                {remainingMembers} founding memberships left
+            </p>
             <h1 style={styles.title}>Welcome to the AR Fresko Club</h1>
-
             <p style={styles.subtitle}>
-              Fresh chicken is just the beginning. Join as a founding member to
-              unlock chef recipes, product trials, surprise rewards and
-              member-only benefits.
+              Join as a founding member to unlock chef recipes, product trials,
+              surprise rewards and member-only benefits.
             </p>
 
             <div style={styles.benefits}>
@@ -98,26 +104,12 @@ function ClubContent() {
             </div>
 
             <form onSubmit={handleSubmit} style={styles.form}>
-              <input
-                style={styles.input}
-                placeholder="Your name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
-
-              <input
-                style={styles.input}
-                placeholder="WhatsApp number"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              />
-
-              <input
-                style={styles.input}
-                placeholder="City"
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
-              />
+              <input style={styles.input} placeholder="Your name" value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              <input style={styles.input} placeholder="WhatsApp number" value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <input style={styles.input} placeholder="City" value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })} />
 
               <button style={styles.button} type="submit">
                 Become a Member
@@ -127,31 +119,13 @@ function ClubContent() {
         ) : (
           <>
             <p style={styles.badge}>Membership Confirmed</p>
-
             <h1 style={styles.title}>Welcome to the Club 🎉</h1>
-
             <p style={styles.subtitle}>
-              You are now one of the AR Fresko Founding Members.
+              Your member-only chef recipes are now unlocked.
             </p>
-
-            <div style={styles.memberBox}>
-              Member #{String(memberNumber || memberCount).padStart(4, "0")}
-            </div>
-
-            <div style={styles.benefits}>
-              <p>✓ Chef Recipes Unlocked</p>
-              <p>✓ Future Product Trials</p>
-              <p>✓ Monthly Member Giveaways</p>
-              <p>✓ Early Access to New Launches</p>
-            </div>
-
             <button style={styles.button} onClick={goToRecipes}>
-              Unlock Chef Recipes
+              View Chef Recipes
             </button>
-
-            <p style={styles.note}>
-              More member benefits launching soon.
-            </p>
           </>
         )}
       </section>
@@ -168,6 +142,66 @@ export default function ClubPage() {
 }
 
 const styles = {
+    page: {
+        minHeight: "100vh",
+        background: "#FFF9F2",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "24px",
+        fontFamily: "Arial, sans-serif",
+      },
+      badge: {
+        display: "inline-block",
+        background: "#F47B20",
+        color: "#fff",
+        padding: "8px 14px",
+        borderRadius: "999px",
+        fontSize: "13px",
+        marginBottom: "12px",
+      },
+      title: {
+        fontSize: "34px",
+        lineHeight: "1.1",
+        margin: "0 0 14px",
+        color: "#0F4C4C",
+      },
+      counter: {
+        color: "#F47B20",
+        fontSize: "15px",
+        fontWeight: "bold",
+        marginBottom: "18px",
+      },
+      benefits: {
+        textAlign: "left",
+        background: "#FFF3E6",
+        padding: "18px",
+        borderRadius: "16px",
+        marginBottom: "24px",
+        color: "#0F4C4C",
+        fontSize: "15px",
+        lineHeight: "1.4",
+      },
+      button: {
+        padding: "15px",
+        borderRadius: "14px",
+        border: "none",
+        background: "#0F4C4C",
+        color: "#fff",
+        fontSize: "16px",
+        fontWeight: "bold",
+        cursor: "pointer",
+        width: "100%",
+      },
+      memberBox: {
+        background: "#F47B20",
+        color: "#fff",
+        padding: "16px",
+        borderRadius: "16px",
+        fontSize: "22px",
+        fontWeight: "bold",
+        marginBottom: "22px",
+      },
   page: {
     minHeight: "100vh",
     background: "#f7f3ea",
@@ -193,12 +227,6 @@ const styles = {
     padding: "8px 14px",
     borderRadius: "999px",
     fontSize: "13px",
-    marginBottom: "12px",
-  },
-  counter: {
-    color: "#143d36",
-    fontSize: "15px",
-    fontWeight: "bold",
     marginBottom: "18px",
   },
   title: {
@@ -228,6 +256,12 @@ const styles = {
     flexDirection: "column",
     gap: "12px",
   },
+  counter: {
+    color: "#143d36",
+    fontSize: "15px",
+    fontWeight: "bold",
+    marginBottom: "18px",
+  },
   input: {
     padding: "14px",
     borderRadius: "12px",
@@ -243,20 +277,5 @@ const styles = {
     fontSize: "16px",
     fontWeight: "bold",
     cursor: "pointer",
-    width: "100%",
-  },
-  memberBox: {
-    background: "#143d36",
-    color: "#fff",
-    padding: "16px",
-    borderRadius: "16px",
-    fontSize: "22px",
-    fontWeight: "bold",
-    marginBottom: "22px",
-  },
-  note: {
-    marginTop: "16px",
-    fontSize: "13px",
-    color: "#777",
   },
 };
