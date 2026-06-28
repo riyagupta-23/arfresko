@@ -1,39 +1,22 @@
 "use client";
 
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-export default function ClubPage() {
+function ClubContent() {
   const searchParams = useSearchParams();
   const product = searchParams.get("product") || "freshbbl";
 
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    city: "",
-  });
-
+  const [form, setForm] = useState({ name: "", phone: "", city: "" });
   const [joined, setJoined] = useState(false);
-
-  const productLabels = {
-    freshbbl: "Boneless Breast",
-    currycut: "Curry Cut",
-    drumsticks: "Drumsticks",
-  };
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!form.name.trim()) {
-      alert("Please enter your name");
-      return;
-    }
-
-    if (!/^[6-9]\d{9}$/.test(form.phone)) {
-      alert("Please enter a valid 10-digit WhatsApp number");
-      return;
-    }
+    if (!form.name.trim()) return alert("Please enter your name");
+    if (!/^[6-9]\d{9}$/.test(form.phone))
+      return alert("Please enter a valid 10-digit WhatsApp number");
 
     const { error } = await supabase.from("club_members").upsert(
       {
@@ -45,10 +28,7 @@ export default function ClubPage() {
       { onConflict: "phone" }
     );
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+    if (error) return alert(error.message);
 
     localStorage.setItem("ar_fresko_club_member", "true");
     setJoined(true);
@@ -64,13 +44,10 @@ export default function ClubPage() {
         {!joined ? (
           <>
             <p style={styles.badge}>Founding Memberships Open</p>
-
             <h1 style={styles.title}>Welcome to the AR Fresko Club</h1>
-
             <p style={styles.subtitle}>
-              Fresh chicken is just the beginning. Join as a founding member to
-              unlock chef recipes, product trials, surprise rewards and
-              member-only benefits.
+              Join as a founding member to unlock chef recipes, product trials,
+              surprise rewards and member-only benefits.
             </p>
 
             <div style={styles.benefits}>
@@ -82,32 +59,12 @@ export default function ClubPage() {
             </div>
 
             <form onSubmit={handleSubmit} style={styles.form}>
-              <input
-                style={styles.input}
-                placeholder="Your name"
-                value={form.name}
-                onChange={(e) =>
-                  setForm({ ...form, name: e.target.value })
-                }
-              />
-
-              <input
-                style={styles.input}
-                placeholder="WhatsApp number"
-                value={form.phone}
-                onChange={(e) =>
-                  setForm({ ...form, phone: e.target.value })
-                }
-              />
-
-              <input
-                style={styles.input}
-                placeholder="City"
-                value={form.city}
-                onChange={(e) =>
-                  setForm({ ...form, city: e.target.value })
-                }
-              />
+              <input style={styles.input} placeholder="Your name" value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              <input style={styles.input} placeholder="WhatsApp number" value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <input style={styles.input} placeholder="City" value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })} />
 
               <button style={styles.button} type="submit">
                 Become a Member
@@ -117,14 +74,10 @@ export default function ClubPage() {
         ) : (
           <>
             <p style={styles.badge}>Membership Confirmed</p>
-
             <h1 style={styles.title}>Welcome to the Club 🎉</h1>
-
             <p style={styles.subtitle}>
-              Your member-only recipes for{" "}
-              <b>{productLabels[product] || "your product"}</b> are now unlocked.
+              Your member-only chef recipes are now unlocked.
             </p>
-
             <button style={styles.button} onClick={goToRecipes}>
               View Chef Recipes
             </button>
@@ -132,6 +85,14 @@ export default function ClubPage() {
         )}
       </section>
     </main>
+  );
+}
+
+export default function ClubPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ClubContent />
+    </Suspense>
   );
 }
 
