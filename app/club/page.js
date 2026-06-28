@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+
 
 function ClubContent() {
   const searchParams = useSearchParams();
@@ -10,6 +11,25 @@ function ClubContent() {
 
   const [form, setForm] = useState({ name: "", phone: "", city: "" });
   const [joined, setJoined] = useState(false);
+
+  const MEMBER_LIMIT = 2000;
+const [memberCount, setMemberCount] = useState(0);
+
+useEffect(() => {
+  async function getMemberCount() {
+    const { count, error } = await supabase
+      .from("club_members")
+      .select("*", { count: "exact", head: true });
+
+    if (!error && count !== null) {
+      setMemberCount(count);
+    }
+  }
+
+  getMemberCount();
+}, []);
+
+const remainingMembers = Math.max(MEMBER_LIMIT - memberCount, 0);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -32,6 +52,7 @@ function ClubContent() {
 
     localStorage.setItem("ar_fresko_club_member", "true");
     setJoined(true);
+    setMemberCount((prev) => prev + 1);
   }
 
   function goToRecipes() {
@@ -43,7 +64,13 @@ function ClubContent() {
       <section style={styles.card}>
         {!joined ? (
           <>
-            <p style={styles.badge}>Founding Memberships Open</p>
+            <p style={styles.badge}>
+                Limited to first 2,000 members
+            </p>
+
+            <p style={styles.counter}>
+                {remainingMembers} founding memberships left
+            </p>
             <h1 style={styles.title}>Welcome to the AR Fresko Club</h1>
             <p style={styles.subtitle}>
               Join as a founding member to unlock chef recipes, product trials,
@@ -150,6 +177,12 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "12px",
+  },
+  counter: {
+    color: "#143d36",
+    fontSize: "15px",
+    fontWeight: "bold",
+    marginBottom: "18px",
   },
   input: {
     padding: "14px",
