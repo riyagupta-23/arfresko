@@ -38,67 +38,75 @@ function ClubContent() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
-    if (!form.name.trim()) return alert("Please enter your name");
-
-    if (!/^[6-9]\d{9}$/.test(form.phone)) {
-      return alert("Please enter a valid 10-digit WhatsApp number");
-    }
-    const memberCode =
-    "AFC-" +
-    Math.random().toString(36).substring(2, 8).toUpperCase();
-
-    
-
-    const { data: existingMember } = await supabase
-      .from("club_members")
-      .insert({
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        city: form.city.trim(),
-        product,
-        member_code: memberCode,
-      })
-      .select("*")
-      .eq("phone", form.phone.trim())
-      .maybeSingle();
-
-    if (existingMember) {
-      alert("You are already a member. Please use Sign in as existing member.");
+  
+    const cleanPhone = form.phone.trim();
+  
+    if (!form.name.trim()) {
+      alert("Please enter your name");
       return;
     }
-
-    
+  
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      alert("Please enter a valid 10-digit WhatsApp number");
+      return;
+    }
+  
+    // 1. First check if phone already exists
+    const { data: existingMember, error: checkError } = await supabase
+      .from("club_members")
+      .select("*")
+      .eq("phone", cleanPhone)
+      .maybeSingle();
+  
+    if (checkError) {
+      alert(checkError.message);
+      return;
+    }
+  
+    // 2. If exists, log them in — do NOT create new row
+    if (existingMember) {
+      localStorage.setItem("ar_fresko_club_member", "true");
+      localStorage.setItem("ar_fresko_member_id", existingMember.id);
+      localStorage.setItem("ar_fresko_member_no", existingMember.member_no);
+      localStorage.setItem("ar_fresko_member_code", existingMember.member_code);
+      localStorage.setItem(`unlocked_${product}`, "true");
+  
+      window.location.href = `/member?id=${existingMember.id}`;
+      return;
+    }
+  
+    // 3. Only create new member if phone does not exist
+    const memberCode =
+      "FRESKO-" +
+      Math.random().toString(36).substring(2, 7).toUpperCase();
+  
     const { data, error } = await supabase
       .from("club_members")
       .insert({
         name: form.name.trim(),
-        phone: form.phone.trim(),
+        phone: cleanPhone,
         city: form.city.trim(),
         product,
+        member_code: memberCode,
       })
       .select()
       .single();
-
+  
     if (error) {
       alert(error.message);
       return;
     }
-    localStorage.setItem(
-        "ar_fresko_member_code",
-        data.member_code
-      );
-
+  
     localStorage.setItem("ar_fresko_club_member", "true");
     localStorage.setItem("ar_fresko_member_id", data.id);
     localStorage.setItem("ar_fresko_member_no", data.member_no);
+    localStorage.setItem("ar_fresko_member_code", data.member_code);
     localStorage.setItem(`unlocked_${product}`, "true");
-
-    setMemberNumber(data.member_no);
+  
+    setMemberNumber(data.member_code || data.member_no);
     setMemberCount((prev) => prev + 1);
     setJoined(true);
   }
-
   async function signInExistingMember() {
     if (!/^[6-9]\d{9}$/.test(form.phone)) {
       return alert("Enter your registered WhatsApp number first");
