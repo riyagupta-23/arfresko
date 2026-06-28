@@ -103,9 +103,8 @@ function ClubContent() {
     localStorage.setItem("ar_fresko_member_id", data.id);
     localStorage.setItem("ar_fresko_member_no", data.member_no);
     localStorage.setItem(`unlocked_${product}`, "true");
-
-    setMemberNumber(data.member_no);
-    setJoined(true);
+    
+    window.location.href = `/member?id=${data.id}`;
   }
 
   function goToRecipes() {
