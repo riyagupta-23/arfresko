@@ -1,12 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
-
 
 export default function RecipeGate({ product, recipes }) {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [allowed, setAllowed] = useState(false);
+
+  useEffect(() => {
+    const isMember = localStorage.getItem("ar_fresko_club_member");
+    const isUnlocked = localStorage.getItem(`unlocked_${product}`);
   
+    if (isMember === "true" && isUnlocked === "true") {
+      setAllowed(true);
+    } else {
+      window.location.href = `/club?product=${product}`;
+    }
+  }, [product]);
   
   async function saveRecipePDF(recipe) {
     const doc = new jsPDF();
@@ -146,6 +156,10 @@ doc.text(
     } else {
       alert("Sharing is not supported on this device. Please use Save PDF.");
     }
+  }
+
+  if (!allowed) {
+    return null;
   }
   
   return (
