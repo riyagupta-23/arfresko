@@ -43,9 +43,21 @@ function ClubContent() {
     if (!/^[6-9]\d{9}$/.test(form.phone)) {
       return alert("Please enter a valid 10-digit WhatsApp number");
     }
+    const memberCode =
+    "AFC-" +
+    Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    
 
     const { data: existingMember } = await supabase
       .from("club_members")
+      .insert({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        city: form.city.trim(),
+        product,
+        member_code: memberCode,
+      })
       .select("*")
       .eq("phone", form.phone.trim())
       .maybeSingle();
@@ -55,6 +67,7 @@ function ClubContent() {
       return;
     }
 
+    
     const { data, error } = await supabase
       .from("club_members")
       .insert({
@@ -70,6 +83,10 @@ function ClubContent() {
       alert(error.message);
       return;
     }
+    localStorage.setItem(
+        "ar_fresko_member_code",
+        data.member_code
+      );
 
     localStorage.setItem("ar_fresko_club_member", "true");
     localStorage.setItem("ar_fresko_member_id", data.id);
@@ -193,7 +210,7 @@ function ClubContent() {
   Member #{String(memberNumber || "").padStart(4, "0")}
   <br />
   <span style={{ fontSize: "13px", fontWeight: "normal" }}>
-    Tap to open your portal
+    Click to open your portal
   </span>
 </button>
 
