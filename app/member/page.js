@@ -51,7 +51,7 @@ function MemberContent() {
 
     loadPurchaseStats();
   }, [member]); 
-}
+
 
   async function startScanner() {
     const html5QrCode = new Html5Qrcode("barcode-reader");
@@ -126,7 +126,7 @@ function MemberContent() {
       </main>
     );
   }
-
+}
   return (
     <main style={styles.page}>
       <section style={styles.card}>
