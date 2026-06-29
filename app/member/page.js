@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5Qrcode } from "html5-qrcode";
 import { supabase } from "@/lib/supabase";
 
 function MemberContent() {
@@ -50,31 +50,27 @@ function MemberContent() {
     }
 
     loadPurchaseStats();
-  }, [member]);
+  }, [member]); 
+}
 
-  const scanner = new Html5QrcodeScanner(
-    "barcode-reader",
-    {
-      fps: 10,
-      qrbox: 250,
-      rememberLastUsedCamera: true,
-      supportedScanTypes: [],
-      videoConstraints: {
-        facingMode: { exact: "environment" },
+  async function startScanner() {
+    const html5QrCode = new Html5Qrcode("barcode-reader");
+  
+    await html5QrCode.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: 250,
       },
-    },
-    false
-  );
-
-    scanner.render(
       async (decodedText) => {
-        scanner.clear();
+        await html5QrCode.stop();
         setScanResult(decodedText);
         await redeemBarcode(decodedText);
       },
       () => {}
     );
   }
+  
 
   async function redeemBarcode(barcode) {
     if (!member) return alert("Member not loaded");
