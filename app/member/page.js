@@ -163,12 +163,7 @@ function MemberContent() {
           {scanResult && <p style={styles.note}>Last scanned: {scanResult}</p>}
         </div>
 
-        <button
-          style={styles.secondaryButton}
-          onClick={() => (window.location.href = "/freshbbl")}
-        >
-          View Chef Recipes
-        </button>
+       
       </section>
     </main>
   );
