@@ -126,7 +126,7 @@ function MemberContent() {
       </main>
     );
   }
-}
+
   return (
     <main style={styles.page}>
       <section style={styles.card}>
@@ -170,7 +170,7 @@ function MemberContent() {
       </section>
     </main>
   );
-
+}
 
 export default function MemberPage() {
   return (
