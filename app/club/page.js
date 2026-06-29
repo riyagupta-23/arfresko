@@ -135,13 +135,6 @@ function ClubContent() {
     window.location.href = `/member?id=${data.id}`;
   }
 
-  function goToRecipes() {
-    const urlProduct = searchParams.get("product") || "freshbbl";
-  
-    localStorage.setItem(`unlocked_${urlProduct}`, "true");
-    window.location.href = `/${urlProduct}`;
-  }
-
   function startScanner() {
     const scanner = new Html5QrcodeScanner(
       "barcode-reader",
@@ -307,9 +300,19 @@ function ClubContent() {
   </span>
 </button>
 
-            <button style={styles.button} onClick={goToRecipes}>
-              Unlock Chef Recipes
-            </button>
+<h2 style={{ marginTop: "24px" }}>Access Recipes</h2>
+
+<button style={styles.button} onClick={() => (window.location.href = "/freshbbl")}>
+  Boneless Breast Recipes
+</button>
+
+<button style={styles.button} onClick={() => (window.location.href = "/freshdrumstick")}>
+  Drumstick Recipes
+</button>
+
+<button style={styles.button} onClick={() => (window.location.href = "/freshcurrycut")}>
+  Curry Cut Recipes
+</button>
           </>
         )}
       </section>
