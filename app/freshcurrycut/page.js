@@ -34,7 +34,7 @@ const recipes = [
   },
 ];
 
-export default function FreshBBL() {
+export default function CurryCut() {
   return (
     <RecipeGate
       product="Curry Cut"
