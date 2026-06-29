@@ -7,7 +7,9 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 
 function ClubContent() {
   const searchParams = useSearchParams();
-  const product = searchParams.get("product") || "freshbbl";
+  const urlProduct = searchParams.get("product") || "freshbbl";
+  const product = urlProduct;
+  
   const [scanResult, setScanResult] = useState("");
   const MEMBER_LIMIT = 5000;
 
@@ -134,8 +136,10 @@ function ClubContent() {
   }
 
   function goToRecipes() {
-    localStorage.setItem(`unlocked_${product}`, "true");
-    window.location.href = `/${product}`;
+    const urlProduct = searchParams.get("product") || "freshbbl";
+  
+    localStorage.setItem(`unlocked_${urlProduct}`, "true");
+    window.location.href = `/${urlProduct}`;
   }
 
   function startScanner() {
