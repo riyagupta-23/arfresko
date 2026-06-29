@@ -52,12 +52,19 @@ function MemberContent() {
     loadPurchaseStats();
   }, [member]);
 
-  function startScanner() {
-    const scanner = new Html5QrcodeScanner(
-      "barcode-reader",
-      { fps: 10, qrbox: 250 },
-      false
-    );
+  const scanner = new Html5QrcodeScanner(
+    "barcode-reader",
+    {
+      fps: 10,
+      qrbox: 250,
+      rememberLastUsedCamera: true,
+      supportedScanTypes: [],
+      videoConstraints: {
+        facingMode: { exact: "environment" },
+      },
+    },
+    false
+  );
 
     scanner.render(
       async (decodedText) => {
