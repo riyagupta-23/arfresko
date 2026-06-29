@@ -174,7 +174,7 @@ function MemberContent() {
       </section>
     </main>
   );
-}
+
 
 export default function MemberPage() {
   return (
